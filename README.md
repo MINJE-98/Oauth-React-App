@@ -1,70 +1,45 @@
-# Getting Started with Create React App
+# Oauth 1.0 vs Oauth 2.0
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+왜 Oauth 2.0으로 대체되어 사용되고 있을까?
 
-## Available Scripts
+Oauth1.0에서 토큰 승인 과정에서 세션 고정 공격이라는 보안 결함이 발견되었고, 이문제를 해결하기 위해 Oauth 1.0a로 업데이트 되었다.
 
-In the project directory, you can run:
+Oauth 1.0a에도 여전히 여러가지 문제들이 존재했다.
 
-### `yarn start`
+1. 웹 애플리케이션이 아닌 애플리케이션에서는 사용하기 곤란하다.
+2. 절차가 복잡하여 Service Provider에게 부담이 발생한다.
+3. Access Token의 유효기간이 없다.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+등 이러한 문제점들을 개선한 Oauth 2.0을 사용하는 것이다.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+# Oauth 2.0 특징
 
-### `yarn test`
+1. Refresh Token을 도입하여 토큰 유효 기간을 단축
+2. Service Provider의 역할 명칭 변경 및 세분화
+    1. Resource Owner
+    2. Resource Server
+    3. Authentication Server
+3. API 호출 인증 및 보안
+    1. 서명 대신 HTTPS를 의무화 하여 서버 및 클라이언트 개발 편의성 개선
+4. 클라이언트 지원 유형
+    1. 웹 애플리케이션 뿐만아니라 거의 모든 애플리케이션 지원
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# 역할
 
-### `yarn build`
+OAuth 2.0은 4가지의 역할이 있다.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Client | OAuth 2.0을 사용해 서드파티 로그인 기능을 구현할 자사 또는 개인 애플리케이션 서버다.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Recource Owner | 서드파티 애플리케이션 (Google, Facebook, Kakao 등)에 이미 개인정보를 저장(회원가입)하고 있으며 Client가 제공하는 서비스를 이용하려는 사용자,'Resource' 는 개인정보라고 생각하면 된다.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Resource Server | 사용자의 개인정보를 가지고있는 애플리케이션 (Google, Facebook, Kakao 등) 서버다.  Client는 Token을 이 서버로 넘겨 개인정보를 응답 받을 수 있다.
 
-### `yarn eject`
+Authorization Server | 권한을 부여(인증에 사용할 아이템을 제공주는)해주는 서버다.사용자는 이 서버로 ID, PW를 넘겨 Authorization Code를 발급 받을 수 있다.Client는 이 서버로 Authorization Code을 넘겨 Token을 받급 받을 수 있다.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+# 인증 절차
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+![https://tilog-file-service-s3.s3.ap-northeast-2.amazonaws.com/1o8h72wr8ywc2022-01-15%2012%3A02%3A48.png](https://tilog-file-service-s3.s3.ap-northeast-2.amazonaws.com/1o8h72wr8ywc2022-01-15%2012%3A02%3A48.png)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+그림1. 페이코 Oauth 2.0 설명
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+추가 적으로 8번에서 Authorization code로 Access Token과 Fresh Token을 요청하며, Access Token의 만료기간은 1~3시간정도로 굉장히 짧게 설정되어있고, 8번에서 받은 Refresh Token으로 Access Token을 다시 발급하는 식으로 진행된다.
